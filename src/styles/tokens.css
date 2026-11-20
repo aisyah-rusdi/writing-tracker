@@ -1,0 +1,93 @@
+/* Colour and font variables. Light is the default (pink-led).
+   Dark ("blueberry cheesecake") applies when the device is dark, unless the page
+   sets data-theme="light"; data-theme="dark" forces it. Project colours are NOT
+   here: they come from the Projects sheet and stay the same in both themes. */
+
+:root {
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "DM Sans", system-ui, sans-serif;
+
+  color-scheme: light;
+  --bg: #FCEEF1;
+  --surf: #FFF9FA;
+  --ink: #2A2427;
+  --mut: #7C6B72;
+  --line: #F1D7DE;
+  --g: #3F6B4E;
+  --gs: #D8E8DB;
+  --pk: #E9A7B9;
+  --pks: #F7D3DE;
+  --pkb: #F0C5D2;
+  --pkt: #8A3A55;
+  --err: #B4443C;
+  --errs: #F6DCD8;
+  --errb: #E9B3AD;
+  --errt: #7A2A24;
+  --btn: #3F6B4E;
+  --on-btn: #FFFFFF;
+  --inp: #FFFFFF;
+  --ph: #B9A6AD;
+  --sk: #FFF3F5;
+  --ring: transparent;
+  --confetti-1: #E9A7B9;
+  --confetti-2: #3F6B4E;
+  --confetti-3: #E8DCC4;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1A1636;
+  --surf: #262050;
+  --ink: #F7F0E1;
+  --mut: #B8B0D4;
+  --line: #3B3470;
+  --g: #9AA6FF;
+  --gs: #2F3A78;
+  --pk: #D6A6EC;
+  --pks: #3E2C6E;
+  --pkb: #5B4695;
+  --pkt: #EACBF7;
+  --err: #FF9AA2;
+  --errs: #4D2440;
+  --errb: #7A3B66;
+  --errt: #FFC9CE;
+  --btn: #F4E4A6;
+  --on-btn: #14123A;
+  --inp: #1F1A44;
+  --ph: #6F689A;
+  --sk: #4A4290;
+  --ring: #EDE3CF; /* light outline so the black project stays visible */
+  --confetti-1: #D6A6EC;
+  --confetti-2: #9AA6FF;
+  --confetti-3: #F4E4A6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #1A1636;
+    --surf: #262050;
+    --ink: #F7F0E1;
+    --mut: #B8B0D4;
+    --line: #3B3470;
+    --g: #9AA6FF;
+    --gs: #2F3A78;
+    --pk: #D6A6EC;
+    --pks: #3E2C6E;
+    --pkb: #5B4695;
+    --pkt: #EACBF7;
+    --err: #FF9AA2;
+    --errs: #4D2440;
+    --errb: #7A3B66;
+    --errt: #FFC9CE;
+    --btn: #F4E4A6;
+    --on-btn: #14123A;
+    --inp: #1F1A44;
+    --ph: #6F689A;
+    --sk: #4A4290;
+    --ring: #EDE3CF;
+    --confetti-1: #D6A6EC;
+    --confetti-2: #9AA6FF;
+    --confetti-3: #F4E4A6;
+  }
+}
