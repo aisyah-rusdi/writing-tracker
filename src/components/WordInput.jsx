@@ -1,7 +1,9 @@
 // Large word-count box. Digits only, so a stray letter or "e" can't get in.
+// The id matches the "How many words today?" label on the Today page.
 export default function WordInput({ value, onChange }) {
   return (
     <input
+      id="words"
       className="word-input"
       type="text"
       inputMode="numeric"

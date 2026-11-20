@@ -16,15 +16,12 @@ import {
 } from '../lib/dates'
 import { getPref, setPref } from '../lib/prefs'
 import { sumWords } from '../lib/stats'
-import { useTracker } from '../hooks/useTracker'
-
-// E11 will make this a setting; until then weeks run Monday to Sunday.
-const WEEK_STARTS_ON = MONDAY
+import { useEntries } from '../hooks/useEntries'
 
 const fmt = (n) => n.toLocaleString('en-US')
 
 export default function Today({ onOpenSettings = () => (window.location.hash = '#/settings') }) {
-  const { entries, projects, loading, error, refresh, save, retry } = useTracker()
+  const { entries, projects, loading, error, refresh, save, retry } = useEntries()
 
   const [projectId, setProjectId] = useState(() => getPref('lastProject', null))
   const [words, setWords] = useState('')
@@ -61,7 +58,7 @@ export default function Today({ onOpenSettings = () => (window.location.hash = '
   const selected = active.find((p) => p.id === projectId) || active[0]
 
   const today = todayISO()
-  const weekStart = weekStartOf(today, WEEK_STARTS_ON)
+  const weekStart = weekStartOf(today, getPref('weekStart', MONDAY))
   const weekEnd = weekDays(weekStart)[6]
 
   const todayEntries = entries.filter((e) => e.date === today)
