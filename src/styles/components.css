@@ -1,19 +1,21 @@
 /* =====================================================================
    components.css
-   Shared pieces first, then one section per area of the app, then all the
-   small-screen (max 700px) and reduced-motion rules together at the end.
+   Shared pieces first, then one section per area of the app, then the
+   wide-screen compact rules, and last all the small-screen (max 700px)
+   and reduced-motion rules.
 
    1. Shared: layout helpers, buttons, forms, badges, banners, toast,
-      confetti, skeleton, entry rows
+      confetti, skeleton, entry rows, pagers
    2. App shell (header, top nav, bottom tab bar)
    3. Today
    4. Page header and project filter (Week, Stats, History)
    5. Week chart and stat cards
-   6. Stats
+   6. Stats (summary cards, weekly table, donut)
    7. History (calendar, list, bottom sheet)
-   8. Settings
+   8. Settings (layout, collapsible cards, projects)
    9. Settings: Data card
-   10. Small screens and reduced motion
+   10. Wide screens: compact one-screen Stats and History
+   11. Small screens and reduced motion
    ===================================================================== */
 
 
@@ -113,18 +115,22 @@
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
-/* Entry rows and empty states (Today, Stats, day sheet) */
+/* Entry rows and empty states (Today, day sheet) */
 .entry { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
 .entry__words { margin-left: auto; }
 .empty { text-align: center; padding: 12px 0 4px; }
 .empty p { margin: 6px 0 0; }
-.list-plain > .entry:first-child { border-top: 0; }
+
+/* Pager under a paged list: Stats table, History list, Settings projects */
+.wtable__pager, .history__pager, .settings__pager {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px;
+}
 
 
 /* ---------- 2. App shell ---------- */
 
-.app { max-width: 1040px; margin: 0 auto; padding: 20px 20px 96px; }
-.app-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.app { max-width: 1040px; margin: 0 auto; padding: 16px 20px 32px; }
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
 .brand { font: 600 20px var(--serif); }
 
 .nav-top { display: flex; gap: 4px; }
@@ -136,7 +142,7 @@
   border: 1px solid var(--line); background: var(--surf); font-size: 18px; line-height: 1;
 }
 
-/* Bottom tab bar: hidden on wide screens, shown in section 10. */
+/* Bottom tab bar: hidden on wide screens, shown in section 11. */
 .tabs { display: none; }
 
 
@@ -175,15 +181,27 @@
 .week-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0; }
 .week-nav h2 { text-align: center; }
 
+/* Week page: title, week arrows and filter share one row, so the page fits the screen. */
+.week__head--bar { margin-bottom: 16px; }
+.week-nav--inline { margin: 0; gap: 8px; }
+.week-nav--inline h2 { font-size: 18px; white-space: nowrap; min-width: 110px; }
+.week-nav--inline .btn.sec { padding: 6px 14px; }
+
 .stat-grid { display: grid; gap: 16px; grid-template-columns: repeat(4, 1fr); }
 .stat__label { display: flex; align-items: center; gap: 8px; }
-.stat__value { font-size: 26px; }
+.stat-grid .card { padding: 14px 18px; }
+.stat__value { font-size: 24px; line-height: 1.2; }
 
 
 /* ---------- 5. Week chart ---------- */
 
-.week-chart { margin-bottom: 16px; }
-.chart { display: flex; align-items: flex-end; gap: 10px; height: 230px; padding-top: 10px; }
+.week-chart { margin-bottom: 16px; padding: 16px 20px; }
+/* The chart takes whatever height is left on screen (between 150px and 260px). */
+.chart {
+  display: flex; align-items: flex-end; gap: 10px; padding-top: 10px;
+  height: 230px; /* fallback */
+  height: clamp(150px, calc(100svh - 340px), 260px);
+}
 .col {
   flex: 1; min-width: 0; height: 100%;
   display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -200,16 +218,16 @@
   font-size: 10px; line-height: 1.1; color: var(--mut); text-align: center;
 }
 .nolog--future { opacity: 0.5; }
-.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
 .legend > span { display: inline-flex; align-items: center; gap: 8px; }
 
 
-/* ---------- 6. Stats ---------- */
+/* ---------- 6. Stats (summary cards, paginated weekly table, donut) ---------- */
 
 .stats__summary { margin: 16px 0; }
 .stats__skeleton { height: 360px; margin-top: 16px; }
-.stats__note { margin: 8px 0 0; }
-.stats-grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; align-items: start; }
+.stats-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; }
+.stats-grid--solo { grid-template-columns: 1fr; } /* no donut: table takes the full width */
 
 .wtable { width: 100%; border-collapse: collapse; font-size: 15px; }
 .wtable th, .wtable td { padding: 10px 6px; text-align: right; border-bottom: 1px solid var(--line); }
@@ -217,22 +235,21 @@
 .wtable th { font-weight: 500; color: var(--mut); }
 .wtable .mixcell { text-align: left; width: 42%; }
 .wtable tfoot td { font-weight: 600; border: 0; }
-.wtable__sub { margin: 4px 0 8px; }
-.wtable__toggle {
-  display: flex; align-items: center; gap: 6px; width: 100%;
-  background: none; border: 0; padding: 4px 0; text-align: left;
-}
-.wtable__detail td { text-align: left; background: var(--bg); }
-.wtable__part { padding: 4px 0; }
-.wtable__more { margin: 12px 0 0; }
+.wtable__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.wtable__sub { margin: 0; }
+.wtable__blank { visibility: hidden; } /* keeps the table height steady on the last page */
 .mixbar {
   display: flex; height: 12px; border-radius: 6px; overflow: hidden;
   box-shadow: 0 0 0 1px var(--ring);
 }
 
-.recent-week { margin-top: 12px; }
-.goal-row { align-items: flex-start; }
-.goal-row .dot { margin-top: 7px; }
+.donut { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
+.donut__svg { width: 100%; max-width: 180px; height: auto; align-self: center; }
+.donut__total { font: 600 18px var(--sans); fill: var(--ink); font-variant-numeric: tabular-nums; }
+.donut__label { font: 400 8px var(--sans); fill: var(--mut); }
+.donut__item { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.donut__words { margin-left: auto; }
+.donut__pct { min-width: 36px; text-align: right; }
 
 
 /* ---------- 7. History ---------- */
@@ -240,7 +257,6 @@
 .history__sub { margin: 0 0 16px; }
 .history__bar { margin-bottom: 12px; }
 .history__nav { margin: 4px 0 12px; }
-.history__more { margin: 12px 0 0; }
 .week-nav__today { text-align: center; margin: -8px 0 16px; } /* "Back to this month" */
 
 /* Calendar */
@@ -266,12 +282,15 @@
 .day:disabled { opacity: 0.35; }
 
 /* List view */
+.hist-size { display: flex; align-items: center; gap: 8px; } /* rows-per-page choice */
+.hist-size .pf { min-width: 0; padding: 6px 12px; }
 .hist-row {
   display: flex; align-items: center; gap: 12px; width: 100%;
   padding: 12px 0; background: none; border: 0; border-top: 1px solid var(--line);
   text-align: left;
 }
 .hist-list > .hist-row:first-child { border-top: 0; }
+.hist-row--blank { visibility: hidden; } /* keeps the list height steady on the last page */
 .hist-row__dots { display: flex; gap: 4px; margin-left: auto; }
 .hist-row__words { min-width: 56px; text-align: right; }
 
@@ -306,14 +325,45 @@
 
 .settings h1 { margin-bottom: 16px; }
 .settings .card h2 { margin: 0; }
+
+/* Layout. Phones: one list, in the order below (the columns melt away).
+   Wide screens: Connection and Data on the left, Preferences above Projects on the right. */
 .settings-grid { display: grid; gap: 16px; align-items: start; grid-template-columns: 1fr; }
+.settings-col { display: contents; }
+.settings-conn { order: 1; }
+.settings-proj { order: 2; }
+.settings-pref { order: 3; }
+.settings-data { order: 4; }
+
+@media (min-width: 701px) {
+  .settings-grid { grid-template-columns: 1fr 1fr; }
+  .settings-col { display: grid; gap: 16px; align-content: start; min-width: 0; }
+  .settings-conn, .settings-proj, .settings-pref, .settings-data { order: 0; }
+}
+
+/* Text helpers */
 .settings__tz { margin: 4px 0 0; }
 .settings__note { margin: 12px 0 0; }
 .settings__archived { margin: 16px 0 0; }
-.settings-conn form, .settings-pref .field:first-of-type { margin-top: 12px; }
+.settings-conn form { margin-top: 12px; }
 
+/* Collapsible cards (Connection, Preferences, Data) */
+.collapsible__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.collapsible__head h2 { flex: 1; min-width: 0; }
+.collapsible__toggle {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 4px 0; border: 0; background: none; text-align: left;
+}
+.collapsible__chev {
+  width: 8px; height: 8px; flex: none;
+  border-right: 2px solid var(--mut); border-bottom: 2px solid var(--mut);
+  transform: rotate(45deg); transition: transform 0.15s;
+}
+.collapsible__toggle[aria-expanded="false"] .collapsible__chev { transform: rotate(-45deg); }
+.collapsible__body { margin-top: 12px; }
+
+/* Projects */
 .project-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
-.project-row:first-of-type { margin-top: 12px; }
 .project-row__main { min-width: 0; }
 .project-row__actions { margin-left: auto; display: flex; gap: 8px; }
 .project-row--archived { color: var(--mut); }
@@ -324,19 +374,6 @@
 .swatch { width: 32px; height: 32px; border-radius: 50%; border: 0; padding: 0; box-shadow: 0 0 0 1px var(--ring); }
 .swatch.on { outline: 2px solid var(--ink); outline-offset: 2px; }
 .swatch-custom { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
-
-/* Two columns on wide screens: Projects takes the whole right side. */
-@media (min-width: 701px) {
-  .settings-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto 1fr;
-    grid-template-areas: "conn proj" "pref proj" "data proj" "rest proj";
-  }
-  .settings-conn { grid-area: conn; }
-  .settings-proj { grid-area: proj; }
-  .settings-pref { grid-area: pref; }
-  .settings-data { grid-area: data; }
-}
 
 
 /* ---------- 9. Settings: Data card (import and export) ---------- */
@@ -354,7 +391,48 @@
 .data-done { margin: 16px 0 0; color: var(--g); font-weight: 600; }
 
 
-/* ---------- 10. Small screens and reduced motion ---------- */
+/* ---------- 10. Wide screens: compact one-screen Stats and History ---------- */
+
+/* Tighter spacing so these pages need little or no scrolling.
+   This section comes after the base rules on purpose, so it overrides them.
+
+   Stats: WeeklyTable.jsx (fitRows) picks the row count from the window height and
+   assumes rows are 36px tall and everything else adds up to about 390px.
+   If you change a Stats size here, update ROW_H and OVERHEAD in WeeklyTable.jsx.
+
+   History: calendar cells are sized so 6 rows fit the window; list rows are 40px,
+   so 10 rows fit without scrolling. */
+@media (min-width: 701px) {
+  /* Both pages */
+  .app:has(.stats), .app:has(.history) { padding: 12px 20px 16px; }
+  .app:has(.stats) .app-header, .app:has(.history) .app-header { margin-bottom: 8px; }
+  .stats .card, .history .card { padding: 14px 20px; }
+
+  /* Stats */
+  .stats .stats__summary { margin: 10px 0; }
+  .stats .stat-grid .card { padding: 10px 18px; }
+  .wtable th, .wtable td { padding: 6px; }
+  .wtable tbody tr, .wtable tfoot tr { height: 36px; }
+  .wtable__pager { margin-top: 10px; }
+  .donut { gap: 10px; margin-top: 8px; }
+  .donut__svg { max-width: min(180px, 24vh); }
+  .donut__item { padding: 4px 0; }
+
+  /* History */
+  .history__sub { margin: 0 0 10px; }
+  .history__bar { margin-bottom: 8px; }
+  .history__nav { margin: 0 0 8px; }
+  .history .week-nav .btn.sec { padding: 4px 14px; }
+  .history__pager { margin-top: 10px; }
+  .day {
+    aspect-ratio: auto; min-height: 0; padding: 5px 8px;
+    height: clamp(46px, calc((100svh - 350px) / 6), 96px);
+  }
+  .hist-row { height: 40px; padding: 0; }
+}
+
+
+/* ---------- 11. Small screens and reduced motion ---------- */
 
 @media (max-width: 700px) {
   /* App shell: top nav becomes the bottom tab bar */
@@ -378,7 +456,8 @@
   .word-input { font-size: 48px; }
 
   /* Week */
-  .chart { gap: 6px; height: 190px; }
+  .chart { gap: 6px; height: 190px; height: clamp(130px, calc(100svh - 500px), 200px); }
+  .week__head--bar .week-nav--inline { order: 3; flex: 1 0 100%; justify-content: space-between; }
   .col { font-size: 11px; }
   .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .stat-grid .card { padding: 12px; }
@@ -398,9 +477,11 @@
   .sheet { padding: 20px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
 }
 
-/* Reduced motion: no confetti, no shimmer, no progress slide. The messages still show. */
+/* Reduced motion: no confetti, no shimmer, no progress slide, no chevron turn.
+   The messages still show. */
 @media (prefers-reduced-motion: reduce) {
   .confetti { display: none; }
   .skeleton { animation: none; }
   .data-progress i { transition: none; }
+  .collapsible__chev { transition: none; }
 }

@@ -1,35 +1,57 @@
-import { Fragment, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const fmt = (n) => n.toLocaleString('en-US')
 const UNKNOWN = '#BDB5A3'
+const PAGE_SIZE = 5 // week rows per page on small screens (the Total row is extra)
 
-// weeks:   from weeklyTotals(), newest first: { start, label, total, byProject }
-// total:   the grand total shown in the footer
-// byId:    Map of project id -> project
-// showMix: true for "All projects" (mix bar and tap-to-expand); false for one project
+// On wide screens the number of rows follows the window height, so the Stats page
+// fits without scrolling. ROW_H and OVERHEAD match the compact CSS in
+// components.css (section 6): OVERHEAD is everything on the page that is not a
+// week row (header, title, summary cards, table head, total row, pager).
+const DESKTOP = '(min-width: 701px)'
+const ROW_H = 36
+const OVERHEAD = 390
+const MIN_ROWS = 3
+const MAX_ROWS = 12
+
+function fitRows() {
+  if (!window.matchMedia(DESKTOP).matches) return PAGE_SIZE
+  const rows = Math.floor((window.innerHeight - OVERHEAD) / ROW_H)
+  return Math.max(MIN_ROWS, Math.min(MAX_ROWS, rows))
+}
+
+// Re-measures when the window is resized or turned.
+function useFitPageSize() {
+  const [size, setSize] = useState(fitRows)
+  useEffect(() => {
+    const onResize = () => setSize(fitRows())
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return size
+}
+
+// weeks:    from weeklyTotals(), newest first: { start, label, total, byProject }
+// total:    the grand total shown in the footer (all weeks, not just this page)
+// byId:     Map of project id -> project
+// showMix:  true for "All projects" (shows the project mix bar); false for one project
+// pageSize: optional. Leave it out to fit the window; pass a number to force one.
 //
-// Only the newest `recent` weeks get their own row. Older weeks fold into one
-// "Earlier weeks" row (its bar is always full width: it shows the mix, not a size).
-export default function WeeklyTable({ weeks, total, byId, showMix, recent = 4, subtitle }) {
-  const [showAll, setShowAll] = useState(false)
-  const [open, setOpen] = useState(null)
+// Weeks are split into pages, newest first. Bars are scaled against the biggest
+// week overall, so bars on different pages can be compared.
+// Paging: "Older" (left) goes back in time, "Newer" (right) comes forward.
+export default function WeeklyTable({ weeks, total, byId, showMix, subtitle, pageSize }) {
+  const [page, setPage] = useState(0)
+  const fitSize = useFitPageSize()
+  const size = pageSize ?? fitSize
 
-  const canFold = weeks.length > recent
-  const folded = canFold && !showAll
-  const shown = folded ? weeks.slice(0, recent) : weeks
-
-  const rows = shown.map((w) => ({ key: w.start, label: w.label, total: w.total, byProject: w.byProject }))
-  if (folded) {
-    const byProject = {}
-    let sum = 0
-    for (const w of weeks.slice(recent)) {
-      sum += w.total
-      for (const [id, words] of Object.entries(w.byProject)) byProject[id] = (byProject[id] || 0) + words
-    }
-    rows.push({ key: 'earlier', label: 'Earlier weeks', total: sum, byProject, full: true })
-  }
-
-  const max = Math.max(1, ...shown.map((w) => w.total))
+  const pageCount = Math.max(1, Math.ceil(weeks.length / size))
+  const current = Math.min(page, pageCount - 1)
+  const first = current * size
+  const rows = weeks.slice(first, first + size)
+  // On the last page, invisible rows keep the table (and the pager) at the same height.
+  const blanks = pageCount > 1 ? size - rows.length : 0
+  const max = Math.max(1, ...weeks.map((w) => w.total))
 
   // Project parts of one row, in picker order.
   const partsOf = (byProject) =>
@@ -39,7 +61,6 @@ export default function WeeklyTable({ weeks, total, byId, showMix, recent = 4, s
         return {
           id,
           words,
-          name: p ? p.name : 'Unknown project',
           colour: p ? p.colour : UNKNOWN,
           order: p ? p.sortOrder || 0 : 999,
         }
@@ -48,8 +69,10 @@ export default function WeeklyTable({ weeks, total, byId, showMix, recent = 4, s
 
   return (
     <section className="card scroll">
-      <h2>Weekly totals</h2>
-      <p className="mut wtable__sub">{subtitle}</p>
+      <div className="wtable__head">
+        <h2>Weekly totals</h2>
+        <p className="mut wtable__sub">{subtitle}</p>
+      </div>
 
       <table className="wtable">
         <thead>
@@ -60,60 +83,33 @@ export default function WeeklyTable({ weeks, total, byId, showMix, recent = 4, s
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => {
-            const parts = partsOf(r.byProject)
-            const isOpen = open === r.key
-            return (
-              <Fragment key={r.key}>
-                <tr>
-                  <td>
-                    {showMix ? (
-                      <button
-                        type="button"
-                        className="wtable__toggle"
-                        aria-expanded={isOpen}
-                        onClick={() => setOpen(isOpen ? null : r.key)}
-                      >
-                        {r.label}
-                        <span aria-hidden="true" className="mut">
-                          {isOpen ? '▴' : '▾'}
-                        </span>
-                      </button>
-                    ) : (
-                      r.label
-                    )}
-                  </td>
-                  {showMix && (
-                    <td className="mixcell">
-                      <div
-                        className="mixbar"
-                        style={{ width: `${r.full ? 100 : Math.max(10, (r.total / max) * 100)}%` }}
-                      >
-                        {parts.map((p) => (
-                          <i key={p.id} style={{ flex: p.words, background: p.colour }} />
-                        ))}
-                      </div>
-                    </td>
-                  )}
-                  <td className="num">{fmt(r.total)}</td>
-                </tr>
-                {showMix && isOpen && (
-                  <tr className="wtable__detail">
-                    <td colSpan={3}>
-                      {parts.map((p) => (
-                        <div className="row wtable__part" key={p.id}>
-                          <span>
-                            <span className="dot" style={{ background: p.colour }} /> {p.name}
-                          </span>
-                          <span className="num">{fmt(p.words)}</span>
-                        </div>
-                      ))}
-                    </td>
-                  </tr>
-                )}
-              </Fragment>
-            )
-          })}
+          {rows.map((w) => (
+            <tr key={w.start}>
+              <td>{w.label}</td>
+              {showMix && (
+                <td className="mixcell">
+                  <div className="mixbar" style={{ width: `${Math.max(10, (w.total / max) * 100)}%` }}>
+                    {partsOf(w.byProject).map((p) => (
+                      <i key={p.id} style={{ flex: p.words, background: p.colour }} />
+                    ))}
+                  </div>
+                </td>
+              )}
+              <td className="num">{fmt(w.total)}</td>
+            </tr>
+          ))}
+
+          {Array.from({ length: blanks }, (_, i) => (
+            <tr className="wtable__blank" key={`blank${i}`} aria-hidden="true">
+              <td>&nbsp;</td>
+              {showMix && (
+                <td className="mixcell">
+                  <div className="mixbar" />
+                </td>
+              )}
+              <td className="num">&nbsp;</td>
+            </tr>
+          ))}
         </tbody>
         <tfoot>
           <tr>
@@ -124,12 +120,28 @@ export default function WeeklyTable({ weeks, total, byId, showMix, recent = 4, s
         </tfoot>
       </table>
 
-      {canFold && (
-        <p className="wtable__more">
-          <button type="button" className="btn sec btn--sm" onClick={() => setShowAll((v) => !v)}>
-            {showAll ? 'Fold earlier weeks' : `Show every week (${weeks.length})`}
+      {pageCount > 1 && (
+        <div className="wtable__pager">
+          <button
+            type="button"
+            className="btn sec btn--sm"
+            disabled={current === pageCount - 1}
+            onClick={() => setPage(current + 1)}
+          >
+            ‹ Older
           </button>
-        </p>
+          <span className="mut" aria-live="polite">
+            Weeks {first + 1}–{first + rows.length} of {weeks.length}
+          </span>
+          <button
+            type="button"
+            className="btn sec btn--sm"
+            disabled={current === 0}
+            onClick={() => setPage(current - 1)}
+          >
+            Newer ›
+          </button>
+        </div>
       )}
     </section>
   )

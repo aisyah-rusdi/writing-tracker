@@ -1,9 +1,9 @@
 import { WEEK_STARTS } from '../hooks/useSettings'
+import Collapsible from './Collapsible'
 
 export default function PreferencesCard({ settings, onChange }) {
   return (
-    <section className="card settings-pref">
-      <h2>Preferences</h2>
+    <Collapsible id="preferences" title="Preferences" className="settings-pref">
       <label className="field">
         <span>Week starts on</span>
         <select
@@ -33,6 +33,6 @@ export default function PreferencesCard({ settings, onChange }) {
           onChange={(e) => onChange('celebration', e.target.checked)}
         />
       </label>
-    </section>
+    </Collapsible>
   )
 }

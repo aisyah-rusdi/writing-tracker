@@ -78,8 +78,28 @@ export default function Week() {
 
   return (
     <div className="week">
-      <div className="week__head">
+      <div className="week__head week__head--bar">
         <h1>Week</h1>
+        <div className="week-nav week-nav--inline">
+          <button
+            type="button"
+            className="btn sec"
+            aria-label="Previous week"
+            onClick={week.goPrev}
+          >
+            ‹
+          </button>
+          <h2 aria-live="polite">{week.label}</h2>
+          <button
+            type="button"
+            className="btn sec"
+            aria-label="Next week"
+            disabled={!week.canGoNext}
+            onClick={week.goNext}
+          >
+            ›
+          </button>
+        </div>
         <div className="week__tools">
           <button
             type="button"
@@ -107,27 +127,6 @@ export default function Week() {
       </div>
 
       <LoadGate>
-      <div className="week-nav">
-        <button
-          type="button"
-          className="btn sec"
-          aria-label="Previous week"
-          onClick={week.goPrev}
-        >
-          ‹
-        </button>
-        <h2 aria-live="polite">{week.label}</h2>
-        <button
-          type="button"
-          className="btn sec"
-          aria-label="Next week"
-          disabled={!week.canGoNext}
-          onClick={week.goNext}
-        >
-          ›
-        </button>
-      </div>
-
       {loading ? (
         <div className="skeleton" style={{ height: 300 }} aria-busy="true" aria-label="Loading" />
       ) : (

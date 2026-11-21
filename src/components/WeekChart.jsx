@@ -1,6 +1,8 @@
 const fmt = (n) => n.toLocaleString('en-US')
 
-const BAR_AREA = 170 // px for the tallest bar
+// Space taken by the number above a bar, the day label below it and the gaps.
+// The tallest bar gets everything else, so the chart can change height with the screen.
+const RESERVED = 56 // px
 const MIN_SCALE = 1000 // so a quiet week doesn't make one small day look huge
 
 // bars:   [{ date, label, total, parts: [{ id, name, colour, words }], future }]
@@ -23,7 +25,10 @@ export default function WeekChart({ bars, legend }) {
               {b.total ? (
                 <>
                   <span className="num">{fmt(b.total)}</span>
-                  <div className="bars" style={{ height: `${(b.total / max) * BAR_AREA}px` }}>
+                  <div
+                    className="bars"
+                    style={{ height: `calc((100% - ${RESERVED}px) * ${b.total / max})` }}
+                  >
                     {b.parts.map((p) => (
                       <div
                         key={p.id}

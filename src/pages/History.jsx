@@ -7,14 +7,20 @@ import Modal from '../components/Modal'
 import { useEntries } from '../hooks/useEntries'
 import { useToday } from '../hooks/useToday'
 import { MONDAY, fillDays, formatDate, toISO, weekdayLabels } from '../lib/dates'
-import { getPref } from '../lib/prefs'
+import { getPref, setPref } from '../lib/prefs'
 
 const fmt = (n) => n.toLocaleString('en-US')
-const PAGE = 30 // days per page in the list view
+const PAGE_SIZES = [5, 10, 15] // days per page in the list view
+const DEFAULT_PAGE_SIZE = 10
 const UNKNOWN = '#BDB5A3'
 
 // Shading: 0 nothing, then four steps by words in the day.
 const levelOf = (words) => (!words ? 0 : words < 300 ? 1 : words < 700 ? 2 : words < 1000 ? 3 : 4)
+
+function startPageSize() {
+  const saved = getPref('historyPageSize', DEFAULT_PAGE_SIZE)
+  return PAGE_SIZES.includes(saved) ? saved : DEFAULT_PAGE_SIZE
+}
 
 export default function History() {
   const { entries, projects, loading } = useEntries()
@@ -26,7 +32,8 @@ export default function History() {
   const [view, setView] = useState('calendar') // 'calendar' | 'list'
   const [monthStart, setMonthStart] = useState(currentMonth)
   const [selected, setSelected] = useState(null) // 'yyyy-MM-dd' while the sheet is open
-  const [limit, setLimit] = useState(PAGE)
+  const [pageSize, setPageSize] = useState(startPageSize)
+  const [page, setPage] = useState(0) // list page, 0 = newest days
 
   const byId = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects])
   const colourOf = (id) => (byId.get(id) ? byId.get(id).colour : UNKNOWN)
@@ -54,6 +61,23 @@ export default function History() {
     }
     return [...map.values()].sort((a, b) => b.date.localeCompare(a.date))
   }, [entries])
+
+  // Paging. The page is kept in range, so deleting the last day on a page
+  // moves back to the previous page instead of showing an empty one.
+  const pageCount = Math.max(1, Math.ceil(dayList.length / pageSize))
+  const current = Math.min(page, pageCount - 1)
+  const first = current * pageSize
+  const pageRows = dayList.slice(first, first + pageSize)
+  // On the last page, invisible rows keep the list (and the pager) at the same height.
+  const blanks = pageCount > 1 ? pageSize - pageRows.length : 0
+
+  function changePageSize(value) {
+    const n = Number(value)
+    if (!PAGE_SIZES.includes(n)) return
+    setPref('historyPageSize', n)
+    setPageSize(n)
+    setPage(0)
+  }
 
   const subtitle =
     (view === 'calendar' ? format(month, 'MMMM yyyy') : 'All days') + ' · tap a day to add, edit or delete'
@@ -85,6 +109,22 @@ export default function History() {
             </button>
           </div>
           {view === 'calendar' && <span className="mut">Dashed days: not logged</span>}
+          {view === 'list' && (
+            <label className="hist-size mut">
+              <span>Rows per page</span>
+              <select
+                className="pf"
+                value={pageSize}
+                onChange={(e) => changePageSize(e.target.value)}
+              >
+                {PAGE_SIZES.map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
 
         {view === 'calendar' && (
@@ -170,7 +210,7 @@ export default function History() {
           ) : (
             <>
               <div className="hist-list">
-                {dayList.slice(0, limit).map((d) => (
+                {pageRows.map((d) => (
                   <button
                     type="button"
                     className="hist-row"
@@ -186,17 +226,35 @@ export default function History() {
                     <span className="num hist-row__words">{fmt(d.total)}</span>
                   </button>
                 ))}
+                {Array.from({ length: blanks }, (_, i) => (
+                  <div className="hist-row hist-row--blank" key={`blank${i}`} aria-hidden="true">
+                    &nbsp;
+                  </div>
+                ))}
               </div>
-              {dayList.length > limit && (
-                <p className="history__more">
+
+              {pageCount > 1 && (
+                <div className="history__pager">
                   <button
                     type="button"
                     className="btn sec btn--sm"
-                    onClick={() => setLimit((n) => n + PAGE)}
+                    disabled={current === pageCount - 1}
+                    onClick={() => setPage(current + 1)}
                   >
-                    Show more days
+                    ‹ Older
                   </button>
-                </p>
+                  <span className="mut" aria-live="polite">
+                    Days {first + 1}–{first + pageRows.length} of {dayList.length}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn sec btn--sm"
+                    disabled={current === 0}
+                    onClick={() => setPage(current - 1)}
+                  >
+                    Newer ›
+                  </button>
+                </div>
               )}
             </>
           ))}

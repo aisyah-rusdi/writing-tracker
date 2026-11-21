@@ -9,6 +9,8 @@ import {
   saveConnection,
 } from '../lib/api'
 
+import Collapsible from './Collapsible'
+
 // Asks the script to answer, and reports the outcome without throwing.
 async function check() {
   try {
@@ -100,11 +102,13 @@ export default function ConnectionCard({ onConnected, onDisconnected }) {
   const [badgeClass, badgeText] = BADGES[status]
 
   return (
-    <section className="card settings-conn">
-      <div className="row">
-        <h2>Connection</h2>
-        <span className={`badge ${badgeClass}`}>{badgeText}</span>
-      </div>
+    <Collapsible
+      id="connection"
+      title="Connection"
+      className="settings-conn"
+      defaultOpen={!isConfigured()}
+      badge={<span className={`badge ${badgeClass}`}>{badgeText}</span>}
+    >
       {status === 'ok' && info && info.timezone && (
         <p className="mut settings__tz">Sheet time zone: {info.timezone}</p>
       )}
@@ -153,6 +157,6 @@ export default function ConnectionCard({ onConnected, onDisconnected }) {
           )}
         </div>
       </form>
-    </section>
+    </Collapsible>
   )
 }

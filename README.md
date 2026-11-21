@@ -280,7 +280,7 @@ Date,Project,Words,Note
 | E10 | Stats page | Weekly table with mix bars and tap-to-expand breakdown, summary cards, Recent weeks bars, gap list, goals, project filter | ✅ |
 | E11 | Settings and data tools | Script URL, passphrase, project management, week start, goals, import, CSV export | ✅ |
 | E12 | UI, styling and theming | Design tokens, user-chosen project colours, mobile-first layout, nav bar and bottom tabs, light/dark mode with toggle, dark-mode outlines | ✅ |
-| E13 | Quality and hardening | Midnight rollover, load-error states, error boundary, duplicates, archived projects in old data, cross-device sync testing | ✅ code, testing still open |
+| E13 | Quality and hardening | Midnight rollover, load-error states, error boundary, duplicates, archived projects in old data, cross-device sync testing | ✅ |
 
 ---
 

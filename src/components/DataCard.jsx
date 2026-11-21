@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { describeError } from '../lib/api'
 import { buildPreview, exportCsv, importEntries } from '../lib/importExport'
+import Collapsible from './Collapsible'
 
 const fmt = (n) => n.toLocaleString('en-US')
 const SHOW_PROBLEMS = 5
@@ -92,7 +93,7 @@ export default function DataCard({ projects, loading, configured, onImported }) 
   const canImport = preview && problems.length === 0 && !busy
 
   return (
-    <section className="card settings-data">
+    <Collapsible id="data" title="Data" className="settings-data">
       <h2>Data</h2>
 
       {!configured && (
@@ -226,6 +227,6 @@ export default function DataCard({ projects, loading, configured, onImported }) 
             : 'Everything in that file was already imported.'}
         </p>
       )}
-    </section>
+    </Collapsible>
   )
 }
