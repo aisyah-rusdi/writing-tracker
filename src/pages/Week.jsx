@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
+import LoadGate from '../components/LoadGate'
 import StatCard from '../components/StatCard'
 import WeekChart from '../components/WeekChart'
 import { useEntries } from '../hooks/useEntries'
+import { useToday } from '../hooks/useToday'
 import { useWeek } from '../hooks/useWeek'
-import { MONDAY, todayISO, weekdayLabels } from '../lib/dates'
+import { MONDAY, weekdayLabels } from '../lib/dates'
 import { getPref } from '../lib/prefs'
 
 const fmt = (n) => n.toLocaleString('en-US')
@@ -15,7 +17,7 @@ export default function Week() {
   const week = useWeek(entries, weekStartsOn)
   const [filter, setFilter] = useState('all')
 
-  const today = todayISO()
+  const today = useToday()
   const labels = weekdayLabels(weekStartsOn)
 
   const ordered = useMemo(
@@ -94,6 +96,7 @@ export default function Week() {
         </select>
       </div>
 
+      <LoadGate>
       <div className="week-nav">
         <button
           type="button"
@@ -143,6 +146,7 @@ export default function Week() {
           </div>
         </>
       )}
+      </LoadGate>
     </div>
   )
 }

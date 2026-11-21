@@ -10,13 +10,13 @@ import {
   MONDAY,
   formatLongDate,
   formatWeekRange,
-  todayISO,
   weekDays,
   weekStartOf,
 } from '../lib/dates'
 import { getPref, setPref } from '../lib/prefs'
 import { sumWords } from '../lib/stats'
 import { useEntries } from '../hooks/useEntries'
+import { useToday } from '../hooks/useToday'
 
 const fmt = (n) => n.toLocaleString('en-US')
 
@@ -57,7 +57,7 @@ export default function Today({ onOpenSettings = () => (window.location.hash = '
   )
   const selected = active.find((p) => p.id === projectId) || active[0]
 
-  const today = todayISO()
+  const today = useToday()
   const weekStart = weekStartOf(today, getPref('weekStart', MONDAY))
   const weekEnd = weekDays(weekStart)[6]
 
@@ -182,6 +182,9 @@ export default function Today({ onOpenSettings = () => (window.location.hash = '
               value={selected ? selected.id : ''}
               onChange={(id) => setProjectId(id)}
             />
+            {active.length === 0 && !error && (
+              <p className="mut">No active project. Add or restore one in Settings.</p>
+            )}
 
             <p>
               <button

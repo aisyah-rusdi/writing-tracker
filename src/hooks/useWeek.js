@@ -9,6 +9,10 @@
 //   week.daysWritten
 //   week.goPrev(), week.goNext(), week.goToday()
 //   week.isCurrent, week.canGoNext
+//
+// While the current week is showing, it keeps following the current week: if the
+// page is open over midnight on a week boundary, it moves on by itself. Once you
+// browse to an older week, it stays there.
 
 import { useMemo, useState } from 'react';
 import {
@@ -16,23 +20,26 @@ import {
   fillWeek,
   formatWeekRange,
   shiftWeek,
-  todayISO,
   weekStartOf,
 } from '../lib/dates';
+import { useToday } from './useToday';
 
 export function useWeek(entries, weekStartsOn = MONDAY) {
-  // Start on the week that contains today.
-  const [weekStart, setWeekStart] = useState(() => weekStartOf(todayISO(), weekStartsOn));
+  const today = useToday();
+  const currentStart = weekStartOf(today, weekStartsOn);
 
-  // If the week-start setting changes, snap the view to the current week
+  // null means "the current week, whichever that is".
+  const [picked, setPicked] = useState(null);
+
+  // If the week-start setting changes, go back to the current week
   // (an old week start would no longer line up with the new setting).
   const [lastSetting, setLastSetting] = useState(weekStartsOn);
   if (lastSetting !== weekStartsOn) {
     setLastSetting(weekStartsOn);
-    setWeekStart(weekStartOf(todayISO(), weekStartsOn));
+    setPicked(null);
   }
 
-  const currentStart = weekStartOf(todayISO(), weekStartsOn);
+  const weekStart = picked ?? currentStart;
 
   return useMemo(() => {
     const days = fillWeek(weekStart, entries);
@@ -44,9 +51,13 @@ export function useWeek(entries, weekStartsOn = MONDAY) {
       daysWritten: days.filter((d) => d.logged).length,
       isCurrent: weekStart === currentStart,
       canGoNext: weekStart < currentStart, // no browsing into future weeks
-      goPrev: () => setWeekStart((s) => shiftWeek(s, -1)),
-      goNext: () => setWeekStart((s) => (s < currentStart ? shiftWeek(s, 1) : s)),
-      goToday: () => setWeekStart(currentStart),
+      goPrev: () => setPicked(shiftWeek(weekStart, -1)),
+      goNext: () => {
+        if (weekStart >= currentStart) return;
+        const next = shiftWeek(weekStart, 1);
+        setPicked(next >= currentStart ? null : next);
+      },
+      goToday: () => setPicked(null),
     };
   }, [weekStart, entries, currentStart]);
 }
