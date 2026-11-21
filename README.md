@@ -292,58 +292,60 @@ Alphabetical within each folder. Epic labels show where each file came from.
 writing-tracker/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml                  E1   
-├── .gitignore                           
+│       └── deploy.yml                  E1
+├── .gitignore
 ├── apps-script/
-│   └── Code.gs                         E2  
-├── eslint.config.js                   
-├── index.html                          
+│   └── Code.gs                         E2
+├── check-imports.mjs                   E13 
+├── eslint.config.js
+├── index.html
 ├── package-lock.json
 ├── package.json
 ├── public/
 │   └── favicon.svg
 ├── README.md
 ├── src/
-│   ├── App.jsx                         E1/E12  
+│   ├── App.jsx                         E1/E12
 │   ├── components/
-│   │   ├── Confetti.jsx                E7   
-│   │   ├── ConnectionCard.jsx          E11  
-│   │   ├── DataCard.jsx                E11  
-│   │   ├── DayCell.jsx                 E9   
-│   │   ├── DaySheet.jsx                E9   
-│   │   ├── EntryRow.jsx                E7   
-│   │   ├── ErrorBoundary.jsx           E13  
-│   │   ├── LoadGate.jsx                E13  
-│   │   ├── Modal.jsx                   E9   
-│   │   ├── NavBar.jsx                  E12  
-│   │   ├── PreferencesCard.jsx         E11  
-│   │   ├── ProjectForm.jsx             E11  
-│   │   ├── ProjectPicker.jsx           E7   
-│   │   ├── ProjectsCard.jsx            E11  
-│   │   ├── StatCard.jsx                E8/E10  
+│   │   ├── Collapsible.jsx             E11 
+│   │   ├── Confetti.jsx                E7
+│   │   ├── ConnectionCard.jsx          E11
+│   │   ├── DataCard.jsx                E11
+│   │   ├── DayCell.jsx                 E9
+│   │   ├── DaySheet.jsx                E9
+│   │   ├── EntryRow.jsx                E7
+│   │   ├── ErrorBoundary.jsx           E13
+│   │   ├── LoadGate.jsx                E13
+│   │   ├── Modal.jsx                   E9
+│   │   ├── NavBar.jsx                  E12
+│   │   ├── PreferencesCard.jsx         E11
+│   │   ├── ProjectForm.jsx             E11
+│   │   ├── ProjectPicker.jsx           E7
+│   │   ├── ProjectsCard.jsx            E11
+│   │   ├── StatCard.jsx                E8/E10
 │   │   ├── Toast.jsx                   E7
-│   │   ├── WeekChart.jsx               E8   
-│   │   ├── WeeklyTable.jsx             E10  
+│   │   ├── WeekChart.jsx               E8
+│   │   ├── WeeklyTable.jsx             E10
 │   │   └── WordInput.jsx               E7
 │   ├── data/
-│   │   └── celebrationMessages.json    E7   
+│   │   └── celebrationMessages.json    E7
 │   ├── hooks/
-│   │   ├── useEntries.js               E4   
+│   │   ├── useEntries.js               E4
 │   │   ├── useProjects.js              E11
-│   │   ├── useSettings.js              E11  
-│   │   ├── useTheme.js                 E12  
-│   │   ├── useToday.js                 E13  
-│   │   └── useWeek.js                  E5   
+│   │   ├── useSettings.js              E11
+│   │   ├── useTheme.js                 E12
+│   │   ├── useToday.js                 E13
+│   │   └── useWeek.js                  E5
 │   ├── lib/
-│   │   ├── api.js                      E3   
-│   │   ├── celebration.js              E7     
-│   │   ├── dates.js                    E5     
-│   │   ├── importExport.js             E11  
-│   │   ├── prefs.js                    E7   
-│   │   ├── stats.js                    E6    
-│   │   ├── storage.js                  E4   
-│   │   └── theme.js                    E11/E12 
-│   ├── main.jsx                        E1   
+│   │   ├── api.js                      E3
+│   │   ├── celebration.js              E7
+│   │   ├── dates.js                    E5
+│   │   ├── importExport.js             E11
+│   │   ├── prefs.js                    E7
+│   │   ├── stats.js                    E6
+│   │   ├── storage.js                  E4
+│   │   └── theme.js                    E11/E12
+│   ├── main.jsx                        E1
 │   ├── pages/
 │   │   ├── History.jsx                 E9
 │   │   ├── Settings.jsx                E11
@@ -351,12 +353,12 @@ writing-tracker/
 │   │   ├── Today.jsx                   E7
 │   │   └── Week.jsx                    E8
 │   ├── state/
-│   │   └── AppContext.jsx              E4   
+│   │   └── AppContext.jsx              E4
 │   └── styles/
-│       ├── base.css                    
-│       ├── components.css              
-│       └── tokens.css                  
-└── vite.config.js                      
+│       ├── base.css
+│       ├── components.css
+│       └── tokens.css
+└── vite.config.js                 
 ```
 
 ### Notes
