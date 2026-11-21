@@ -1,7 +1,28 @@
-/* Shared pieces plus the Today page. */
+/* =====================================================================
+   components.css
+   Shared pieces first, then one section per area of the app, then all the
+   small-screen (max 700px) and reduced-motion rules together at the end.
 
+   1. Shared: layout helpers, buttons, forms, badges, banners, toast,
+      confetti, skeleton, entry rows
+   2. App shell (header, top nav, bottom tab bar)
+   3. Today
+   4. Page header and project filter (Week, Stats, History)
+   5. Week chart and stat cards
+   6. Stats
+   7. History (calendar, list, bottom sheet)
+   8. Settings
+   9. Settings: Data card
+   10. Small screens and reduced motion
+   ===================================================================== */
+
+
+/* ---------- 1. Shared ---------- */
+
+/* Layout helpers */
 .card { background: var(--surf); border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
 .card--pink { background: var(--pks); border-color: var(--pkb); }
+.card.scroll { overflow-x: auto; }
 .mut { color: var(--mut); font-size: 14px; }
 .num { font-variant-numeric: tabular-nums; font-weight: 600; }
 .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -22,6 +43,7 @@
 .chip.on { border-color: var(--g); background: var(--gs); }
 .chip--dashed { border-style: dashed; }
 
+/* Buttons. .btn--sm must stay after .btn.sec (same specificity, last wins). */
 .btn {
   display: block; width: 100%; border: 0; border-radius: 16px;
   background: var(--btn); color: var(--on-btn);
@@ -31,7 +53,9 @@
   display: inline-block; width: auto; font-size: 16px; padding: 10px 16px; font-weight: 500;
   background: var(--surf); color: var(--ink); border: 1px solid var(--line);
 }
+.btn.btn--sm { font-size: 14px; padding: 6px 12px; }
 
+/* Forms */
 .field { display: block; margin-bottom: 14px; }
 .field span { display: block; font-size: 14px; color: var(--mut); margin-bottom: 4px; }
 .field input, .field select, .picker-select select {
@@ -39,27 +63,39 @@
   border-radius: 12px; padding: 12px;
 }
 .picker-select { display: flex; align-items: center; gap: 10px; }
+.hint { font-size: 13px; color: var(--mut); margin: 0 0 12px; }
+.form-error { color: var(--err); font-size: 14px; margin: 0 0 12px; }
+.form-actions { display: flex; gap: 8px; }
+.form-actions .btn { width: auto; flex: 1; }
+.form-actions .btn.sec { flex: none; font-size: 16px; }
+.check { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 0; }
+.check input { width: 20px; height: 20px; accent-color: var(--g); }
 
+/* Sync badges */
 .badge { font-size: 12px; border-radius: 99px; padding: 2px 10px; border: 0; white-space: nowrap; }
 .badge--saved { background: var(--gs); color: var(--g); }
 .badge--syncing { background: var(--pks); color: var(--pkt); }
 .badge--failed { background: var(--errs); color: var(--err); }
 
+/* Progress bar */
 .bar { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 10px 0 4px; }
 .bar i { display: block; height: 100%; background: var(--g); border-radius: 99px; }
 
+/* Banners */
 .banner { border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; font-size: 14px; border: 1px solid; }
 .banner b { display: block; margin-bottom: 2px; }
 .banner .btn { margin-top: 8px; font-size: 14px; padding: 6px 12px; }
 .banner--info { background: var(--pks); border-color: var(--pkb); color: var(--pkt); }
 .banner--error { background: var(--errs); border-color: var(--errb); color: var(--errt); }
 
+/* Toast */
 .toast {
   position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); z-index: 40;
   background: var(--ink); color: var(--bg); border-radius: 16px;
   padding: 12px 20px; max-width: 90vw; text-align: center;
 }
 
+/* Confetti */
 .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
 .confetti__piece {
   position: absolute; top: -10px; width: 10px; height: 14px; border-radius: 2px;
@@ -70,19 +106,42 @@
 .confetti__piece.c2 { background: var(--confetti-3); }
 @keyframes confetti-fall { to { transform: translateY(105vh) rotate(540deg); opacity: 0; } }
 
+/* Loading skeleton */
 .skeleton {
   background: linear-gradient(90deg, var(--line), var(--sk), var(--line));
   background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 20px;
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
-/* Reduced motion: no confetti, no shimmer. The messages still show. */
-@media (prefers-reduced-motion: reduce) {
-  .confetti { display: none; }
-  .skeleton { animation: none; }
+/* Entry rows and empty states (Today, Stats, day sheet) */
+.entry { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.entry__words { margin-left: auto; }
+.empty { text-align: center; padding: 12px 0 4px; }
+.empty p { margin: 6px 0 0; }
+.list-plain > .entry:first-child { border-top: 0; }
+
+
+/* ---------- 2. App shell ---------- */
+
+.app { max-width: 1040px; margin: 0 auto; padding: 20px 20px 96px; }
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.brand { font: 600 20px var(--serif); }
+
+.nav-top { display: flex; gap: 4px; }
+.nav-top a { padding: 8px 16px; border-radius: 999px; color: var(--mut); text-decoration: none; }
+.nav-top a.on { background: var(--btn); color: var(--on-btn); }
+
+.theme-toggle {
+  flex: none; width: 40px; height: 40px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surf); font-size: 18px; line-height: 1;
 }
 
-/* ---------- Today ---------- */
+/* Bottom tab bar: hidden on wide screens, shown in section 10. */
+.tabs { display: none; }
+
+
+/* ---------- 3. Today ---------- */
+
 .today__week { margin: 0 0 16px; }
 .today__label { margin-bottom: 8px; }
 .today__sub { margin: 4px 0 0; }
@@ -100,133 +159,14 @@
 .word-input::placeholder { color: var(--ph); }
 .word-input:focus { border-color: var(--g); }
 
-.entry { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
-.entry__words { margin-left: auto; }
-.empty { text-align: center; padding: 12px 0 4px; }
-.empty p { margin: 6px 0 0; }
-
 .celebration { text-align: center; margin-bottom: 16px; }
 .celebration__quote { font: 500 20px/1.3 var(--serif); margin: 8px 0 4px; }
 
-@media (max-width: 700px) {
-  .today-grid { grid-template-columns: 1fr; }
-  .word-input { font-size: 48px; }
-  .toast { bottom: 84px; }
-}
 
-/* ---------- Settings ---------- */
-.settings h1 { margin-bottom: 16px; }
-.settings .card h2 { margin: 0; }
-.settings-grid { display: grid; gap: 16px; align-items: start; grid-template-columns: 1fr; }
-.settings__tz { margin: 4px 0 0; }
-.settings__note { margin: 12px 0 0; }
-.settings__archived { margin: 16px 0 0; }
-.settings-conn form, .settings-pref .field:first-of-type { margin-top: 12px; }
-
-.btn.btn--sm { font-size: 14px; padding: 6px 12px; }
-.form-actions { display: flex; gap: 8px; }
-.form-actions .btn { width: auto; flex: 1; }
-.form-actions .btn.sec { flex: none; font-size: 16px; }
-.hint { font-size: 13px; color: var(--mut); margin: 0 0 12px; }
-.form-error { color: var(--err); font-size: 14px; margin: 0 0 12px; }
-
-.check { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 0; }
-.check input { width: 20px; height: 20px; accent-color: var(--g); }
-
-.project-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
-.project-row:first-of-type { margin-top: 12px; }
-.project-row__main { min-width: 0; }
-.project-row__actions { margin-left: auto; display: flex; gap: 8px; }
-.project-row--archived { color: var(--mut); }
-
-.project-form { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 8px; }
-.goals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.swatches { display: flex; gap: 10px; align-items: center; margin: 6px 0 14px; flex-wrap: wrap; }
-.swatch { width: 32px; height: 32px; border-radius: 50%; border: 0; padding: 0; box-shadow: 0 0 0 1px var(--ring); }
-.swatch.on { outline: 2px solid var(--ink); outline-offset: 2px; }
-.swatch-custom { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
-
-@media (min-width: 701px) {
-  .settings-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto 1fr;
-    grid-template-areas: "conn proj" "pref proj" "data proj" "rest proj";
-  }
-  .settings-conn { grid-area: conn; }
-  .settings-proj { grid-area: proj; }
-  .settings-pref { grid-area: pref; }
-  .settings-data { grid-area: data; }
-}
-
-/* Append to the end of src/styles/components.css (Data card, E11 part 2) */
-
-.data-preview {
-  border-top: 1px solid var(--line);
-  margin-top: 16px;
-  padding-top: 16px;
-}
-.data-file {
-  margin: 0 0 8px;
-  word-break: break-all;
-}
-.data-summary {
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-.data-project {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-  border-top: 1px solid var(--line);
-}
-.data-project .num {
-  margin-left: auto;
-}
-.data-list {
-  margin: 8px 0;
-  padding-left: 20px;
-  color: var(--err);
-}
-.data-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: 16px;
-}
-.data-actions .btn:not(.sec) {
-  width: auto;
-  flex: 1 1 200px;
-}
-.data-progress {
-  height: 10px;
-  border-radius: 99px;
-  background: var(--line);
-  overflow: hidden;
-  margin: 16px 0 4px;
-}
-.data-progress i {
-  display: block;
-  height: 100%;
-  background: var(--g);
-  border-radius: 99px;
-  transition: width 0.2s;
-}
-.data-done {
-  margin: 16px 0 0;
-  color: var(--g);
-  font-weight: 600;
-}
-@media (prefers-reduced-motion: reduce) {
-  .data-progress i {
-    transition: none;
-  }
-}
-
-/* Append to the end of src/styles/components.css (Week page, E8) */
+/* ---------- 4. Page header and project filter (Week, Stats, History) ---------- */
 
 .week__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.week__tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .pf {
   border: 1px solid var(--line); background: var(--surf); color: var(--ink);
   border-radius: 999px; padding: 8px 14px; min-width: 200px; max-width: 100%;
@@ -234,7 +174,13 @@
 
 .week-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0; }
 .week-nav h2 { text-align: center; }
-.week-nav__today { text-align: center; margin: -8px 0 16px; }
+
+.stat-grid { display: grid; gap: 16px; grid-template-columns: repeat(4, 1fr); }
+.stat__label { display: flex; align-items: center; gap: 8px; }
+.stat__value { font-size: 26px; }
+
+
+/* ---------- 5. Week chart ---------- */
 
 .week-chart { margin-bottom: 16px; }
 .chart { display: flex; align-items: flex-end; gap: 10px; height: 230px; padding-top: 10px; }
@@ -257,26 +203,13 @@
 .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
 .legend > span { display: inline-flex; align-items: center; gap: 8px; }
 
-.stat-grid { display: grid; gap: 16px; grid-template-columns: repeat(4, 1fr); }
-.stat__label { display: flex; align-items: center; gap: 8px; }
-.stat__value { font-size: 26px; }
 
-@media (max-width: 700px) {
-  .chart { gap: 6px; height: 190px; }
-  .col { font-size: 11px; }
-  .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .stat-grid .card { padding: 12px; }
-  .stat__value { font-size: 22px; }
-}
-
-/* Append to the end of src/styles/components.css (Stats page, E10).
-   Needs the Week styles (.week__head, .pf, .stat-grid) from E8. */
+/* ---------- 6. Stats ---------- */
 
 .stats__summary { margin: 16px 0; }
 .stats__skeleton { height: 360px; margin-top: 16px; }
 .stats__note { margin: 8px 0 0; }
 .stats-grid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; align-items: start; }
-.card.scroll { overflow-x: auto; }
 
 .wtable { width: 100%; border-collapse: collapse; font-size: 15px; }
 .wtable th, .wtable td { padding: 10px 6px; text-align: right; border-bottom: 1px solid var(--line); }
@@ -298,25 +231,19 @@
 }
 
 .recent-week { margin-top: 12px; }
-.list-plain > .entry:first-child { border-top: 0; }
 .goal-row { align-items: flex-start; }
 .goal-row .dot { margin-top: 7px; }
 
-@media (max-width: 700px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .wtable { font-size: 13px; }
-  .wtable .mixcell { width: 34%; }
-}
 
-/* Append to the end of src/styles/components.css (History page, E9).
-   Needs the Week styles from E8 (.week-nav, .week-nav__today). */
+/* ---------- 7. History ---------- */
 
 .history__sub { margin: 0 0 16px; }
 .history__bar { margin-bottom: 12px; }
 .history__nav { margin: 4px 0 12px; }
 .history__more { margin: 12px 0 0; }
+.week-nav__today { text-align: center; margin: -8px 0 16px; } /* "Back to this month" */
 
-/* ---------- Calendar ---------- */
+/* Calendar */
 .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .cal .h { text-align: center; font-size: 13px; color: var(--mut); }
 .cal__short { display: none; }
@@ -338,7 +265,7 @@
 .day.sel { box-shadow: 0 0 0 2px var(--g); }
 .day:disabled { opacity: 0.35; }
 
-/* ---------- List ---------- */
+/* List view */
 .hist-row {
   display: flex; align-items: center; gap: 12px; width: 100%;
   padding: 12px 0; background: none; border: 0; border-top: 1px solid var(--line);
@@ -348,7 +275,7 @@
 .hist-row__dots { display: flex; gap: 4px; margin-left: auto; }
 .hist-row__words { min-width: 56px; text-align: right; }
 
-/* ---------- Bottom sheet ---------- */
+/* Bottom sheet (day sheet) */
 .sheetbg {
   position: fixed; inset: 0; z-index: 30;
   background: rgba(42, 40, 35, 0.35);
@@ -374,39 +301,66 @@
 .sheet-edit__label { margin-bottom: 8px; }
 .sheet-edit__note { margin-top: 12px; }
 
-@media (max-width: 700px) {
-  .cal { gap: 4px; }
-  .cal .h { font-size: 11px; }
-  .cal__long { display: none; }
-  .cal__short { display: inline; }
-  .day { min-height: 0; padding: 3px 4px; font-size: 10px; border-radius: 9px; }
-  .sheet { padding: 20px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
+
+/* ---------- 8. Settings ---------- */
+
+.settings h1 { margin-bottom: 16px; }
+.settings .card h2 { margin: 0; }
+.settings-grid { display: grid; gap: 16px; align-items: start; grid-template-columns: 1fr; }
+.settings__tz { margin: 4px 0 0; }
+.settings__note { margin: 12px 0 0; }
+.settings__archived { margin: 16px 0 0; }
+.settings-conn form, .settings-pref .field:first-of-type { margin-top: 12px; }
+
+.project-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.project-row:first-of-type { margin-top: 12px; }
+.project-row__main { min-width: 0; }
+.project-row__actions { margin-left: auto; display: flex; gap: 8px; }
+.project-row--archived { color: var(--mut); }
+
+.project-form { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 8px; }
+.goals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.swatches { display: flex; gap: 10px; align-items: center; margin: 6px 0 14px; flex-wrap: wrap; }
+.swatch { width: 32px; height: 32px; border-radius: 50%; border: 0; padding: 0; box-shadow: 0 0 0 1px var(--ring); }
+.swatch.on { outline: 2px solid var(--ink); outline-offset: 2px; }
+.swatch-custom { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+
+/* Two columns on wide screens: Projects takes the whole right side. */
+@media (min-width: 701px) {
+  .settings-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas: "conn proj" "pref proj" "data proj" "rest proj";
+  }
+  .settings-conn { grid-area: conn; }
+  .settings-proj { grid-area: proj; }
+  .settings-pref { grid-area: pref; }
+  .settings-data { grid-area: data; }
 }
 
-/* Append to the end of src/styles/components.css (app shell, E12) */
 
-.app { max-width: 1040px; margin: 0 auto; padding: 20px 20px 96px; }
+/* ---------- 9. Settings: Data card (import and export) ---------- */
 
-.app-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-.brand { font: 600 20px var(--serif); }
+.data-preview { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
+.data-file { margin: 0 0 8px; word-break: break-all; }
+.data-summary { font-size: 18px; margin-bottom: 8px; }
+.data-project { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); }
+.data-project .num { margin-left: auto; }
+.data-list { margin: 8px 0; padding-left: 20px; color: var(--err); }
+.data-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.data-actions .btn:not(.sec) { width: auto; flex: 1 1 200px; }
+.data-progress { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 16px 0 4px; }
+.data-progress i { display: block; height: 100%; background: var(--g); border-radius: 99px; transition: width 0.2s; }
+.data-done { margin: 16px 0 0; color: var(--g); font-weight: 600; }
 
-.nav-top { display: flex; gap: 4px; }
-.nav-top a { padding: 8px 16px; border-radius: 999px; color: var(--mut); text-decoration: none; }
-.nav-top a.on { background: var(--btn); color: var(--on-btn); }
 
-.theme-toggle {
-  flex: none; width: 40px; height: 40px; border-radius: 999px;
-  border: 1px solid var(--line); background: var(--surf); font-size: 18px; line-height: 1;
-}
-
-/* Bottom tab bar: hidden on wide screens. */
-.tabs { display: none; }
+/* ---------- 10. Small screens and reduced motion ---------- */
 
 @media (max-width: 700px) {
+  /* App shell: top nav becomes the bottom tab bar */
   .app { padding: 16px 16px 96px; }
   .brand { font-size: 18px; }
   .nav-top { display: none; }
-
   .tabs {
     display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
     background: var(--surf); border-top: 1px solid var(--line);
@@ -417,4 +371,36 @@
     color: var(--mut); text-decoration: none; border-radius: 12px;
   }
   .tabs a.on { color: var(--g); font-weight: 600; background: var(--gs); }
+  .toast { bottom: 84px; }
+
+  /* Today */
+  .today-grid { grid-template-columns: 1fr; }
+  .word-input { font-size: 48px; }
+
+  /* Week */
+  .chart { gap: 6px; height: 190px; }
+  .col { font-size: 11px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-grid .card { padding: 12px; }
+  .stat__value { font-size: 22px; }
+
+  /* Stats */
+  .stats-grid { grid-template-columns: 1fr; }
+  .wtable { font-size: 13px; }
+  .wtable .mixcell { width: 34%; }
+
+  /* History */
+  .cal { gap: 4px; }
+  .cal .h { font-size: 11px; }
+  .cal__long { display: none; }
+  .cal__short { display: inline; }
+  .day { min-height: 0; padding: 3px 4px; font-size: 10px; border-radius: 9px; }
+  .sheet { padding: 20px 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Reduced motion: no confetti, no shimmer, no progress slide. The messages still show. */
+@media (prefers-reduced-motion: reduce) {
+  .confetti { display: none; }
+  .skeleton { animation: none; }
+  .data-progress i { transition: none; }
 }

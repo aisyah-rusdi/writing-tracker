@@ -80,20 +80,30 @@ export default function Week() {
     <div className="week">
       <div className="week__head">
         <h1>Week</h1>
-        <select
-          className="pf"
-          aria-label="Filter by project"
-          value={activeFilter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
-          <option value="all">All projects</option>
-          {options.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-              {p.archived ? ' (archived)' : ''}
-            </option>
-          ))}
-        </select>
+        <div className="week__tools">
+          <button
+            type="button"
+            className="btn sec btn--sm"
+            disabled={week.isCurrent}
+            onClick={week.goToday}
+          >
+            This week
+          </button>
+          <select
+            className="pf"
+            aria-label="Filter by project"
+            value={activeFilter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="all">All projects</option>
+            {options.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+                {p.archived ? ' (archived)' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <LoadGate>
@@ -117,13 +127,6 @@ export default function Week() {
           ›
         </button>
       </div>
-      {!week.isCurrent && (
-        <p className="week-nav__today">
-          <button type="button" className="btn sec btn--sm" onClick={week.goToday}>
-            Back to this week
-          </button>
-        </p>
-      )}
 
       {loading ? (
         <div className="skeleton" style={{ height: 300 }} aria-busy="true" aria-label="Loading" />
